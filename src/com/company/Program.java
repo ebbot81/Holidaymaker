@@ -42,7 +42,6 @@ public class Program {
                 registerCustomer();
                 break;
             case 2:
-                headLines();
                 ArrayList<Room> vacantRooms = database.getVacantRoom();
                 printRooms(vacantRooms, 0);
                 break;
@@ -50,7 +49,6 @@ public class Program {
                 bookRoom();
                 break;
             case 4:
-                headLinesForBooking();
                 ArrayList<Booking> bookings = database.getBookings();
                 printBookings(bookings);
                 cancelReservation();
@@ -97,13 +95,15 @@ public class Program {
     public void headLinesForBooking() {
         System.out.print(String.format("%3s","ID"));
         System.out.print(String.format("%16s", "CUSTOMER"));
-        System.out.print(String.format("%22s", "LOCATION"));
+        System.out.print(String.format("%25s", "LOCATION"));
         System.out.print(String.format("%18s", "START-DATE"));
         System.out.print(String.format("%18s", "END-DATE\n"));
-        System.out.print(" ***************************************************************************\n");
+        System.out.print(" ******************************************************************************\n");
     }
 
     private void printRooms (ArrayList<Room> rooms, int minNumberOfBeds) {
+        System.out.printf("Totalt hittades %d rum \n", rooms.size());
+        headLines();
         for (int i = 0; i < rooms.size(); i++) {
             Room room = rooms.get(i);
 
@@ -116,10 +116,12 @@ public class Program {
     }
 
     private void printBookings (ArrayList<Booking> bookings) {
+        System.out.printf("Totalt hittades %d bokningar\n", bookings.size());
+        headLinesForBooking();
         for (int i = 0; i < bookings.size(); i++) {
             Booking booking = bookings.get(i);
 
-            System.out.printf(" %-10d%-16s      %-9s       %10s         %10s\n", booking.getId(), booking.getCustomerName(), booking.getLocation(),
+            System.out.printf(" %-10d%-19s      %-9s       %10s         %10s\n", booking.getId(), booking.getCustomerName(), booking.getLocation(),
                     booking.getStartDate(), booking.getEndDate());
         }
     }
@@ -135,6 +137,9 @@ public class Program {
 
         ArrayList<Room> vacantRooms = database.searchRoomWithCriteria(includeWithChildren, includeWithLiveMusic, includeWithPool, includeWithRestaurant);
 
+        if (vacantRooms == null || vacantRooms.isEmpty()) {
+            return null;
+        }
         printRooms(vacantRooms, numberOfBeds);
 
         System.out.println("Ange rums-id");
@@ -200,10 +205,13 @@ public class Program {
         } else {
 
         }
-        headLines();
+
 
         Room room = getRoomForBooking(includeWithChildren, includeWithLiveMusic, includeWithPool, includeWithRestaurant, numberOfTravelers);
-
+        if (room == null) {
+            System.out.println("Tyvärr hittades ingen resa med dina önskemål, var god försök igen");
+            return;
+        }
         System.out.println("Ange startdatum");
         Date startDate = parseDate(scanner.nextLine());
 
@@ -220,6 +228,11 @@ public class Program {
 
         if (startDate.before(openingDate) || endDate.after(closedDate) ) {
             System.out.println("Säsongen är inte öppen, välj ett datum mellan 2020-06-01 - 2020-07-31");
+            return;
+        }
+
+        if (room.checkIfDatesCollide(startDate, endDate)) {
+            System.out.println("Vänligen gör en ny bokning med nytt datum");
             return;
         }
 

@@ -70,4 +70,18 @@ public class Room {
 
         return dates;
     }
+
+    public boolean checkIfDatesCollide(Date startDate, Date endDate) {
+        for (int i = 0; i < bookings.size(); i++) {
+            Booking booking = bookings.get(i);
+            if ((booking.getStartDate().before(startDate) && booking.getStartDate().after(endDate))
+                    || (booking.getStartDate().before(startDate) && booking.getEndDate().after(startDate))
+                    || (booking.getStartDate().after(startDate) && booking.getEndDate().after(endDate))
+                    || (booking.getStartDate().after(startDate) && booking.getEndDate().before(endDate))) {
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
 }

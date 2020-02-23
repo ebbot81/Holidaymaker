@@ -135,7 +135,8 @@ public class DatabaseConnector {
                 "FROM bookings AS b " +
                 "INNER JOIN customers AS c ON c.id = b.customer_id " +
                 "INNER JOIN rooms AS r ON r.id_room = b.room_id " +
-                "WHERE r.id_room = ?";
+                "WHERE r.id_room = ? " +
+                "ORDER BY start_date";
 
         ArrayList<Booking> bookings = new ArrayList<>();
         try {
